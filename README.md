@@ -3,7 +3,7 @@ This is very simple Colyseus server template. It is mostly initial setup but it 
 # Instalation
 You can clone repository by using the command:
 ```
-git clone ...
+git clone https://github.com/VGFP/SimpleColyseusServer.git
 ```
 After that you can install it using this command:
 ```
