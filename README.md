@@ -7,7 +7,7 @@ git clone https://github.com/VGFP/SimpleColyseusServer.git
 ```
 After that you can install it using this command:
 ```
-cd ./SimpleColyseusServer-master
+cd ./SimpleColyseusServer
 npm install
 ```
 # Running the server
