@@ -18,7 +18,8 @@
     "@types/redis": "^2.8.31",
     "colyseus": "^0.14.19",
     "express": "^4.17.1",
-    "jose": "^3.14.0",
+    "firebase-admin": "^9.11.0",
+    "request": "^2.88.2",
     "ts-node": "^10.1.0",
     "tslib": "^2.3.0"
   },

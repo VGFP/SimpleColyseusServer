@@ -1,44 +1,57 @@
 import { Room, Client } from 'colyseus';
-import { jwtVerify } from 'jose/jwt/verify'
+import { request } from 'https';
+import * as admin from 'firebase-admin';
+
+// Please check documentation: 
+/** https://firebase.google.com/docs/auth/admin/verify-id-tokens#web */ 
+const serviceAccount = require('path to your json file with private key');
 
 export class GameRoom extends Room {
 
     clientsDict = new Map<string, Client>();
 
+    onCreate() {
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+            databaseURL: "you will get this URL when you create your private key"
+          });
+    }
+
     onJoin(client: Client) {
         this.clientsDict.set(client.sessionId,client)
         console.table(this.clientsDict);
     }
-
-    getJSONP(url: string, success: (arg0: any) => any) {
-
-        var ud = '_' + +new Date,
-            script = document.createElement('script'),
-            head = document.getElementsByTagName('head')[0] 
-                   || document.documentElement;
     
-        window[ud] = function(data: any) {
-            head.removeChild(script);
-            success && success(data);
-        };
-    
-        script.src = url.replace('callback=?', 'callback=' + ud);
-        head.appendChild(script);
-    
-    }
-    
-    
-
     async onAuth(client: Client, options: any) {
-        const firebaseKeyJSON = await this.getJSONP('https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com',function(data) {
-            console.log(data);
-    });
-        const jwt = options.token;
-        // const { payload, protectedHeader } = await jwtVerify(jwt, publicKey, {
-        //     /**You need to fill this values by yourself */
-        //     issuer: 'https://securetoken.google.com/<projectId>', // Must be "https://securetoken.google.com/<projectId>", where <projectId> is the same project ID used for aud above.
-        //     audience: 'Firebase project ID' // Must be your Firebase project ID, the unique identifier for your Firebase project, which can be found in the URL of that project's console.
-        //   })
+        
+        const jwt = options.accessToken[0];
+
+        let ret_val: boolean;
+        
+        await admin
+            .auth()
+            .verifyIdToken(jwt)
+            .then((decodedToken) => {
+                
+                const uid = decodedToken.uid;
+                // console.log(uid);
+                if (uid == options.accessToken[1]) {
+                    console.log(":)");
+                    ret_val = true;
+                } else {
+                    console.log("UID do not match");                   
+                    ret_val = false;
+                }
+
+            })
+            .catch((error) => {
+                // Handle error
+                console.log(error);
+                
+                ret_val = false;
+            });
+
+            return ret_val;
     }
 
     onLeave(client: Client) {
